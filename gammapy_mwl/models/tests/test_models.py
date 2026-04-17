@@ -1,5 +1,4 @@
 import pytest
-from importlib.util import find_spec
 import numpy as np
 from numpy.testing import assert_allclose
 import astropy.units as u
@@ -7,22 +6,16 @@ import astropy.units as u
 from gammapy.modeling.models import PowerLawSpectralModel, SkyModel
 from gammapy_mwl.models.sherpa import SherpaSpectralModel
 
-sherpa_avail = False
-if find_spec("sherpa") is not None:
-    sherpa_avail = True
-    from sherpa.astro.xspec import XSwabs
-    from sherpa.models import PowLaw1D
 
-
-@pytest.mark.skipif(not sherpa_avail, reason="Sherpa is not installed")
 def test_SherpaSpectralModel():
-    energy_grid = np.linspace(0.5, 10.0, 10) * u.keV
+    sherpa = pytest.importorskip("sherpa")
 
-    plaw = PowLaw1D()
+    energy_grid = np.linspace(0.5, 10.0, 10) * u.keV
+    plaw = sherpa.models.PowLaw1D()
     plaw.ampl = 1e-3
     plaw.gamma = 2
 
-    abs_model = XSwabs()
+    abs_model = sherpa.astro.xspec.XSwabs()
     abs_model.nH = 5
 
     # Gammapy wrapper
